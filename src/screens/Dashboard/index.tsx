@@ -1,12 +1,34 @@
-import React from "react";
-import { Text } from "react-native";
+import React from 'react';
 
-import { Title, Container } from "./styles";
+import {
+  Container,
+  Header,
+  Photo,
+  Icon,
+  User,
+  UserGreeting,
+  UserInfo,
+  UserName,
+  UserWrapper,
+} from './styles';
 
 export function Dashboard() {
   return (
     <Container>
-      <Title>Dashboard</Title>
+      <Header>
+        <UserWrapper>
+          <UserInfo>
+            <Photo source={{ uri: 'https://github.com/lmiguelm.png' }} />
+
+            <User>
+              <UserGreeting>Olá,</UserGreeting>
+              <UserName>Miguel</UserName>
+            </User>
+          </UserInfo>
+
+          <Icon name="power" />
+        </UserWrapper>
+      </Header>
     </Container>
   );
 }
