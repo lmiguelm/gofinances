@@ -25,6 +25,7 @@ export function AppRoutes() {
             paddingVertical: Platform.OS === 'ios' ? 20 : 0,
             height: Platform.OS === 'ios' ? 88 : 60,
           },
+          tabBarHideOnKeyboard: true,
         }}
       >
         <Screen
