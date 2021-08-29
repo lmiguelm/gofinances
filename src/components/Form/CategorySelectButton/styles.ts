@@ -1,13 +1,13 @@
 import styled, { css } from 'styled-components/native';
 import { Feather } from '@expo/vector-icons';
-import { TouchableOpacity } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { RectButton } from 'react-native-gesture-handler';
 
 interface CategoryContainerProps {
   hasError: boolean;
 }
 
-export const Container = styled(TouchableOpacity).attrs({
+export const Container = styled(RectButton).attrs({
   activeOpacity: 0.7,
 })<CategoryContainerProps>`
   background-color: ${({ theme }) => theme.colors.shape};
