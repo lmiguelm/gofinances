@@ -1,4 +1,4 @@
-# 💬 GoFinances
+# 💸 GoFinances
 
 Projeto desenvolvido no Ignite de React Native da Rocketseat.
 
