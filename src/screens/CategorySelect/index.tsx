@@ -7,7 +7,7 @@ import { categories } from '../../utils/categories';
 
 import { Container, Category, Icon, Name, Separator, Footer } from './styles';
 
-interface Category {
+export interface Category {
   key: string;
   name: string;
 }

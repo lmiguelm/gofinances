@@ -1,11 +1,15 @@
-import styled from 'styled-components/native';
+import styled, { css } from 'styled-components/native';
 import { Feather } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 
+interface CategoryContainerProps {
+  hasError: boolean;
+}
+
 export const Container = styled(TouchableOpacity).attrs({
   activeOpacity: 0.7,
-})`
+})<CategoryContainerProps>`
   background-color: ${({ theme }) => theme.colors.shape};
   border-radius: 5px;
 
@@ -14,6 +18,12 @@ export const Container = styled(TouchableOpacity).attrs({
   justify-content: space-between;
 
   padding: 18px 16px;
+
+  ${({ hasError }) =>
+    hasError &&
+    css`
+      border: 0.5px solid ${({ theme }) => theme.colors.attention};
+    `}
 `;
 
 export const Category = styled.Text`
