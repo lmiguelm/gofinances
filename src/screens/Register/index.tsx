@@ -3,6 +3,7 @@ import { Keyboard, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
+import uuid from 'react-native-uuid';
 
 import { Button } from '../../components/Form/Button';
 import { CategorySelectButton } from '../../components/Form/CategorySelectButton';
@@ -13,6 +14,10 @@ import { Category, CategorySelect } from '../CategorySelect';
 
 import { Container, Fields, Form, TransactionsTypes } from './styles';
 import { InputForm } from '../../components/Form/InputForm/indes';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { TRANSACTIONS_COLLECTION } from '../../config/storage';
+
+import { useNavigation } from '@react-navigation/native';
 
 interface FormData {
   name: string;
@@ -31,8 +36,11 @@ export function Register() {
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
+
+  const navigation = useNavigation<any>();
 
   const [transactionType, setTransactionType] = useState<'up' | 'down'>();
   const [categoryModalOpen, setCategoryModalOpen] = useState<boolean>(false);
@@ -59,7 +67,7 @@ export function Register() {
     setCategory(category);
   }
 
-  function handleRegister(form: FormData) {
+  async function handleRegister(form: FormData) {
     const errorTitle = 'Campo obrigatório não informado';
 
     if (!transactionType) {
@@ -71,14 +79,35 @@ export function Register() {
       return Alert.alert(errorTitle, 'Selecione uma categoria');
     }
 
-    const data = {
+    const newTransaction = {
+      id: String(uuid.v4()),
       name: form.name,
       amount: form.amount,
       transactionType,
       category,
+      date: new Date(),
     };
 
-    console.log(data);
+    try {
+      const transactions = await AsyncStorage.getItem(TRANSACTIONS_COLLECTION);
+      const currentTransactions = transactions ? JSON.parse(transactions) : [];
+
+      const transactionsFormated = [...currentTransactions, newTransaction];
+
+      await AsyncStorage.setItem(TRANSACTIONS_COLLECTION, JSON.stringify(transactionsFormated));
+
+      setTransactionType(undefined);
+      setCategory({
+        key: 'category',
+        name: 'Categoria',
+      });
+      reset();
+
+      navigation.navigate('Listagem');
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Não foi possível salvar');
+    }
   }
 
   return (
