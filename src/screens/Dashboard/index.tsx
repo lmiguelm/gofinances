@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { useFocusEffect } from '@react-navigation/native';
 
 import { HighlightCard } from '../../components/HighlightCard';
 import { TransactionCard, TransactionCardProps } from '../../components/TransactionCard';
-import { TRANSACTIONS_COLLECTION } from '../../config/storage';
 
 import {
   Container,
   Header,
+  UserWrapper,
+  UserInfo,
   Photo,
-  Icon,
   User,
   UserGreeting,
-  UserInfo,
   UserName,
-  UserWrapper,
+  Icon,
   HighlightCards,
   Transactions,
   Title,
@@ -27,38 +27,101 @@ export interface DataListProps extends TransactionCardProps {
   id: string;
 }
 
-export function Dashboard() {
-  const [data, setData] = useState<DataListProps[]>([]);
+interface HighlightProps {
+  amount: string;
+}
 
-  useFocusEffect(() => {
-    loadTransactions();
+interface HighlightData {
+  entries: HighlightProps;
+  expensives: HighlightProps;
+  total: HighlightProps;
+}
+
+export function Dashboard() {
+  const [transactions, setTransactions] = useState<DataListProps[]>([]);
+  const [highlightData, setHighlightData] = useState<HighlightData>({
+    entries: {
+      amount: '',
+    },
+    expensives: {
+      amount: '',
+    },
+    total: {
+      amount: '',
+    },
   });
+
+  async function loadTransactions() {
+    const dataKey = '@gofinances:transactions';
+    const response = await AsyncStorage.getItem(dataKey);
+    const transactions = response ? JSON.parse(response) : [];
+
+    let entriesTotal = 0;
+    let expensiveTotal = 0;
+
+    const transactionsFormatted: DataListProps[] = transactions.map((item: DataListProps) => {
+      if (item.type === 'positive') {
+        entriesTotal += Number(item.amount);
+      } else {
+        expensiveTotal += Number(item.amount);
+      }
+
+      const amount = Number(item.amount).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+      });
+
+      const date = Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+      }).format(new Date(item.date));
+
+      return {
+        id: item.id,
+        name: item.name,
+        amount,
+        type: item.type,
+        category: item.category,
+        date,
+      };
+    });
+
+    setTransactions(transactionsFormatted);
+
+    const total = entriesTotal - expensiveTotal;
+
+    setHighlightData({
+      entries: {
+        amount: entriesTotal.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        }),
+      },
+      expensives: {
+        amount: expensiveTotal.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        }),
+      },
+      total: {
+        amount: total.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        }),
+      },
+    });
+  }
 
   useEffect(() => {
     loadTransactions();
   }, []);
 
-  async function loadTransactions() {
-    const transactions = await AsyncStorage.getItem(TRANSACTIONS_COLLECTION);
-    const transactionsParsed = transactions ? JSON.parse(transactions) : [];
-
-    const transactionsFormated: DataListProps[] = transactionsParsed.map(
-      (transaction: DataListProps) => ({
-        ...transaction,
-        amount: Number(transaction.amount).toLocaleString('pt-BR', {
-          style: 'currency',
-          currency: 'BRL',
-        }),
-        date: Intl.DateTimeFormat('pt-BR', {
-          day: '2-digit',
-          month: '2-digit',
-          year: '2-digit',
-        }).format(new Date(transaction.date)),
-      })
-    );
-
-    setData(transactionsFormated.reverse());
-  }
+  useFocusEffect(
+    useCallback(() => {
+      loadTransactions();
+    }, [])
+  );
 
   return (
     <Container>
@@ -66,7 +129,6 @@ export function Dashboard() {
         <UserWrapper>
           <UserInfo>
             <Photo source={{ uri: 'https://github.com/lmiguelm.png' }} />
-
             <User>
               <UserGreeting>Olá,</UserGreeting>
               <UserName>Miguel</UserName>
@@ -83,21 +145,19 @@ export function Dashboard() {
         <HighlightCard
           type="up"
           title="Entradas"
-          amount="R$ 17.400,00"
+          amount={highlightData.entries.amount}
           lastTransaction="Última entrada dia 13 de abril"
         />
-
         <HighlightCard
           type="down"
           title="Saídas"
-          amount="R$ 1.259,00"
-          lastTransaction="Última entrada dia 03 de abril"
+          amount={highlightData.expensives.amount}
+          lastTransaction="Última saída dia 13 de abril"
         />
-
         <HighlightCard
           type="total"
           title="Total"
-          amount="R$ 16.241,00"
+          amount={highlightData.total.amount}
           lastTransaction="01 à 16 de abril"
         />
       </HighlightCards>
@@ -106,8 +166,8 @@ export function Dashboard() {
         <Title>Listagem</Title>
 
         <TransactionList
-          data={data}
-          keyExtractor={({ id }) => id}
+          data={transactions}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => <TransactionCard data={item} />}
         />
       </Transactions>
