@@ -4,7 +4,6 @@ import 'intl/locale-data/jsonp/pt-BR';
 import React from 'react';
 
 import { StatusBar } from 'expo-status-bar';
-import { ThemeProvider } from 'styled-components';
 import AppLoading from 'expo-app-loading';
 import {
   useFonts,
@@ -14,6 +13,9 @@ import {
 } from '@expo-google-fonts/poppins';
 
 import theme from './src/global/styles/theme';
+
+import { ThemeProvider } from 'styled-components';
+import { AuthProvider } from './src/contexts/AuthContext';
 
 import { AppRoutes } from './src/routes/app.routes';
 
@@ -30,7 +32,9 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <StatusBar style="light" />
+      <AuthProvider>
+        <StatusBar style="light" />
+      </AuthProvider>
       <AppRoutes />
     </ThemeProvider>
   );

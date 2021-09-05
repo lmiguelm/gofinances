@@ -1,22 +1,44 @@
 import React from 'react';
 import { Platform } from 'react-native';
+
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import { MaterialIcons } from '@expo/vector-icons';
-import { useTheme } from 'styled-components';
 
 import { Dashboard } from '../screens/Dashboard';
 import { Register } from '../screens/Register';
 import { Resume } from '../screens/Resume';
+import { Signin } from '../screens/Signin';
+
+import { useTheme } from 'styled-components';
+import { useAuth } from '../hooks/useAuth';
 
 export function AppRoutes() {
-  const { Navigator, Screen } = createBottomTabNavigator();
+  const TabNavigator = createBottomTabNavigator();
+  const StackNavigator = createNativeStackNavigator();
 
   const { colors } = useTheme();
+  const { isLogged } = useAuth();
+
+  if (!isLogged) {
+    return (
+      <NavigationContainer>
+        <StackNavigator.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
+          <StackNavigator.Screen name="Signin" component={Signin} />
+        </StackNavigator.Navigator>
+      </NavigationContainer>
+    );
+  }
 
   return (
     <NavigationContainer>
-      <Navigator
+      <TabNavigator.Navigator
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: colors.secondary,
@@ -29,7 +51,7 @@ export function AppRoutes() {
           tabBarHideOnKeyboard: true,
         }}
       >
-        <Screen
+        <TabNavigator.Screen
           name="Listagem"
           component={Dashboard}
           options={{
@@ -39,7 +61,7 @@ export function AppRoutes() {
           }}
         />
 
-        <Screen
+        <TabNavigator.Screen
           name="Cadastrar"
           component={Register}
           options={{
@@ -49,7 +71,7 @@ export function AppRoutes() {
           }}
         />
 
-        <Screen
+        <TabNavigator.Screen
           name="Resumo"
           component={Resume}
           options={{
@@ -58,7 +80,7 @@ export function AppRoutes() {
             ),
           }}
         />
-      </Navigator>
+      </TabNavigator.Navigator>
     </NavigationContainer>
   );
 }
