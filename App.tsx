@@ -18,24 +18,27 @@ import { ThemeProvider } from 'styled-components';
 import { AuthProvider } from './src/contexts/AuthContext';
 
 import { AppRoutes } from './src/routes/app.routes';
+import { useAuth } from './src/hooks/useAuth';
 
 export default function App() {
+  const { userStorageLoading } = useAuth();
+
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
     Poppins_700Bold,
   });
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || userStorageLoading) {
     return <AppLoading />;
   }
 
   return (
     <ThemeProvider theme={theme}>
+      <StatusBar style="light" />
       <AuthProvider>
-        <StatusBar style="light" />
+        <AppRoutes />
       </AuthProvider>
-      <AppRoutes />
     </ThemeProvider>
   );
 }

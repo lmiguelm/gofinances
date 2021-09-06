@@ -25,6 +25,7 @@ import { useTheme } from 'styled-components';
 import { addMonths, format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useFocusEffect } from '@react-navigation/core';
+import { useAuth } from '../../hooks/useAuth';
 
 interface TransactionData {
   type: 'positive' | 'negative';
@@ -45,6 +46,7 @@ interface CategoryData {
 
 export function Resume() {
   const { colors } = useTheme();
+  const { user } = useAuth();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -69,7 +71,7 @@ export function Resume() {
   async function loadData() {
     setIsLoading(true);
 
-    const response = await AsyncStorage.getItem(TRANSACTIONS_COLLECTION);
+    const response = await AsyncStorage.getItem(TRANSACTIONS_COLLECTION(user.id));
     const responseFormated = response ? JSON.parse(response) : [];
 
     const expensives = responseFormated.filter(

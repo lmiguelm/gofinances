@@ -8,23 +8,25 @@ Projeto desenvolvido no Ignite de React Native da Rocketseat.
 
 <br>
 
-<!-- ## 🟢 Experimente agora
+## 🟢 Experimente agora
 
-Disponível [aqui](https://letmeask-pearl.vercel.app/).
+Disponível [aqui](https://expo.dev/@lmiguelm/gofinances).
 
 <br>
 
 ## 🎥 Video de demosntração
 
-![Letmeask](.github/letmeask.gif)
+![Letmeask](.github/gofinances.gif)
 
-<br> -->
+<br>
 
 ## 🚀 Tecnologias
 
 - ⚛️ [React Native](https://reactnative.dev/).
+- 🔧 [Expo](https://docs.expo.dev/).
 - 📚 [React Hook Form](https://react-hook-form.com/).
 - 💅 [Styled-Components](https://styled-components.com/).
+- 🔒 [Login social](https://docs.expo.dev/guides/authentication/)
 
 <br>
 

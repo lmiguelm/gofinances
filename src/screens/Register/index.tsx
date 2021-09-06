@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TRANSACTIONS_COLLECTION } from '../../config/storage';
 
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../../hooks/useAuth';
 
 interface FormData {
   name: string;
@@ -41,6 +42,8 @@ export function Register() {
   } = useForm({ resolver: yupResolver(schema) });
 
   const navigation = useNavigation<any>();
+
+  const { user } = useAuth();
 
   const [transactionType, setTransactionType] = useState<'positive' | 'negative'>();
   const [categoryModalOpen, setCategoryModalOpen] = useState<boolean>(false);
@@ -89,12 +92,15 @@ export function Register() {
     };
 
     try {
-      const transactions = await AsyncStorage.getItem(TRANSACTIONS_COLLECTION);
+      const transactions = await AsyncStorage.getItem(TRANSACTIONS_COLLECTION(user.id));
       const currentTransactions = transactions ? JSON.parse(transactions) : [];
 
       const transactionsFormated = [...currentTransactions, newTransaction];
 
-      await AsyncStorage.setItem(TRANSACTIONS_COLLECTION, JSON.stringify(transactionsFormated));
+      await AsyncStorage.setItem(
+        TRANSACTIONS_COLLECTION(user.id),
+        JSON.stringify(transactionsFormated)
+      );
 
       setTransactionType(undefined);
       setCategory({
